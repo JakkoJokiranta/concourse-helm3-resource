@@ -71,11 +71,27 @@ setup_kubernetes() {
   # --- Debug stuff
   echo " => kubeAPI check"
   if [ -f "$source/$token_path" ]; then
-    curl -vvv "${cluster_url}/api" -H "Authorization: Bearer $(cat $source/$token_path)" --cacert $cert_path  
+    curl "${cluster_url}/api" \
+      -H "Authorization: Bearer $(cat $source/$token_path)" \
+      --cacert $cert_path  \
+      --insecure \
+      -vvv
+      
   elif [ ! -z "$token" ]; then
-    curl -vvv "${cluster_url}/api" -H "Authorization: Bearer $token" --cacert $cert_path  
+    curl "${cluster_url}/api" \
+      -H "Authorization: Bearer $token" \
+      --cacert $cert_path \
+      --insecure \
+      -vvv
+
   else
-    echo "[!] Unable to perform verbose curl: No token was provided"
+    echo "[i] No token was provided. Trying Certificates"
+    curl "${cluster_url}/api" \
+      --cacert $ca_path \
+      --cert $cert_path \
+      --key $key_path \
+      --cert-type PEM \
+      -vvv
   fi
   # ---
   kubectl version
