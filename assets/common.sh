@@ -68,7 +68,18 @@ setup_kubernetes() {
     kubectl config use-context default
   fi
 
+  # --- Debug stuff
+  echo " => kubeAPI check"
+  if [ -f "$source/$token_path" ]; then
+    curl -vvv "${cluster_url}/api" -H "Authorization: Bearer $(cat $source/$token_path)" --cacert $cert_path  
+  elif [ ! -z "$token" ]; then
+    curl -vvv "${cluster_url}/api" -H "Authorization: Bearer $token" --cacert $cert_path  
+  else
+    echo "[!] Unable to perform verbose curl: No token was provided"
+  fi
+  # ---
   kubectl version
+
 }
 
 setup_gcp_kubernetes() {
